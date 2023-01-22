@@ -28,6 +28,7 @@ const songs =[
     {id:7, name: 'blues'},
     {id:8, name: 'electronic'},
 ]
+
 app.get("/api/home",(req,res)=>{
     res.send("Welcome to Music App")
 });
