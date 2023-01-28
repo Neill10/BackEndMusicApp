@@ -157,7 +157,7 @@ app.put("/api/home/genres",(req,res)=>{
     //finds the id of the genres thats about to be replaced
     const genreExist = genres.find(g=> g.id === parseInt(req.body.idOfOldGenre));
     if(!genreExist){
-        res.send(req.body.idOfOldGenre + " genre does not exist.");
+        res.send(req.body.idOfOldGenre + " genre ID does not exist.");
     }
     else{
         var temp = genres[req.body.idOfOldGenre - 1].genre;
@@ -172,6 +172,39 @@ app.put("/api/home/genres",(req,res)=>{
     }
 });
 
+//DELETE REQUESTS
+
+//@returns all the genres without deleted genre (should move all ID's accordingly and delete songs connected to a genre)
+//deletes a genre, has one req.body params (genreID)
+app.delete("/api/home/genres",(req,res)=>{
+    const genreExist = genres.find(g=> g.id === parseInt(req.body.genreID));
+    if(!genreExist){
+        res.send(req.params.genreID + " does not Exist!");
+    }
+    else{
+        res.send(genreExist);
+        //removes the genre that makes with genreExist
+        for(var i = 0; i < genres.length; i++){
+            if(genres[i].genre == genreExist.genre){
+                genres.splice(i,i+1);
+                break;
+            }
+        }
+        //removes all the songs connected to genreExist
+        for(var i = 0; i < songs.length; i++){
+            if(songs[i].genre == genreExist.genre){
+                songs.splice(i,i+1);
+            }
+        }
+        //changes all the ids back to numerical order.
+        for(var i = 0; i < genres.length; i++){
+            genres[i].id = i + 1;
+        }
+
+    }
+})
+//deletes songs from a list
+app.delete("/api/home/genres")
 
 /*
 app.get('/api/courses', (req,res)=>{
