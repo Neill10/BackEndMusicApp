@@ -30,12 +30,6 @@ const songs = [
     {id:6, name ="wow"},
     */
 ];
-/*
-for(genre of genres){
-    
-}
-*/
-
 
 //GET REQUESTS
 
@@ -69,8 +63,9 @@ app.get("/api/home/genres/:genre",(req,res)=>{
     }
 })
 
+//will get a sorted list of songs
 app.get("/api/home/songs",(req,res)=>{
-    //sortSongByGenre();
+    sortSongByGenre();
     res.send(songs);
 })
 /*
@@ -100,8 +95,9 @@ app.get("/api/home/genres/:id",(req,res)=>{
 
 //POST REQUESTS
 
-//posts new "songs" into songs (change songName to be in the body!!!)
-app.post("/api/home/genres/:genre/:songName",(req,res)=>{
+//posts new "songs" into songs 
+//Has a req.params.genre and req.body.songName
+app.post("/api/home/genres/:genre",(req,res)=>{
     //checks to see if the given genre exists
     const genreExist = genres.find(g=> g.genre === req.params.genre);
     if(!genreExist){
@@ -109,9 +105,9 @@ app.post("/api/home/genres/:genre/:songName",(req,res)=>{
     }
     else{
         //checks to see if the songs already exists in a SPECIFIC GENRE (that means multiples songs of same name but different genres)
-        const songExist = songs.find(s=> s.name === req.params.songName && s.genre === genreExist.genre);
+        const songExist = songs.find(s=> s.name === req.body.songName && s.genre === genreExist.genre);
         if(songExist){
-            res.send(req.params.songName + " song already exists for this genre");
+            res.send(req.body.songName + " song already exists for this genre");
         }
         //this means we will add songs
         else{
@@ -119,7 +115,7 @@ app.post("/api/home/genres/:genre/:songName",(req,res)=>{
                 //we assign an genre and a name property
                 genre: genreExist.genre,
                 id: songCounterGenre(genreExist.genre) + 1,
-                name: req.params.songName,
+                name: req.body.songName,
             }
             songs.push(song);
             res.send(song);
@@ -131,21 +127,22 @@ app.post("/api/home/genres/:genre/:songName",(req,res)=>{
     
 });
 
-//posts new "genres" into genres (change newGenre to be in the Body!!!!)
-app.post("/api/home/genres/:newGenre",(req,res)=>{
+//posts new "genres" into genres
+//has a req.body.newGenre
+app.post("/api/home/genres",(req,res)=>{
     //checks to see if the given genre exists
-    const genreExist = genres.find(g=> g.genre === req.params.newGenre);
+    const genreExist = genres.find(g=> g.genre === req.body.newGenre);
     if(!genreExist){
         var genreCount = genres.length;
         const genreToAdd = {
             id: genreCount + 1,
-            genre: req.params.newGenre,
+            genre: req.body.newGenre,
         };
         genres.push(genreToAdd);
         res.send(genreToAdd);
     }
     else{
-        res.send(req.params.newGenre + " genre already exist");
+        res.send(req.body.newGenre + " genre already exist");
     }
 });
 
@@ -174,8 +171,8 @@ app.put("/api/home/genres",(req,res)=>{
 
 //DELETE REQUESTS
 
-//@returns all the genres without deleted genre (should move all ID's accordingly and delete songs connected to a genre)
-//deletes a genre, has one req.body params (genreID)
+//@returns all the genres without deleted genre (should move all genre ID's accordingly and delete songs connected to a genre)
+//deletes a genre, has one req.body(genreID)
 app.delete("/api/home/genres",(req,res)=>{
     const genreExist = genres.find(g=> g.id === parseInt(req.body.genreID));
     if(!genreExist){
@@ -203,8 +200,41 @@ app.delete("/api/home/genres",(req,res)=>{
 
     }
 })
-//deletes songs from a list
-app.delete("/api/home/genres")
+
+//deletes a song from a genre
+// have a req.params.genre and req.body.songName
+app.delete("/api/home/genres/:genre",(req,res)=>{
+    //searches if the genre exists
+    const genreExist = genres.find(g=> g.id === parseInt(req.params.genre));
+    if(!genreExist){
+        res.send(req.params.genreID + " does not Exist!");
+    }
+    else{
+        //searches if the song exists in the specific genre
+        const songExist = songs.find(s=>s.name === req.body.songName && s.genre === req.params.genre);
+        if(!songExist){
+            res.send(req.body.songName + " does not Exist!");
+        }
+        else{
+            //removes the specific song
+            for(var i = 0; i < songs.length;i++){
+                if(song[i].name == req.body.songName){
+                    song.splice(i,i+1);
+                    break;
+                }
+            }
+            //reorganizes songIDs (numerical order)
+            var count = 1;
+            for(song of songs){
+                if(song.genre === req.params.genre){
+                    song.id = count;
+                    count++;
+                }
+            }
+            res.send(songs);
+        }
+    }
+})
 
 /*
 app.get('/api/courses', (req,res)=>{
