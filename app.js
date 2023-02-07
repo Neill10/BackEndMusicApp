@@ -49,12 +49,12 @@ app.get("/api/home/genres/:genre",(req,res)=>{
     const genreExist = genres.find(g=> g.genre === req.params.genre);
     //console.log(genreExist);
     if(!genreExist){
-        res.send("Genre Does Not Exist");
+        res.status(404).send("Genre Does Not Exist");
     }
     else{
         //if the genre exits, find search it is empty or not
         if(!findGenreSongs(genres.find(g=> g.genre).id)){
-            res.send("Your Genre is Empty! Go to POST to add some songs! :D");
+            res.status(404).send("Your Genre is Empty! Go to POST to add some songs! :D");
         }
         else{
             //console.log("genre " + req.params.genre +" found")
@@ -101,13 +101,13 @@ app.post("/api/home/genres/:genre",(req,res)=>{
     //checks to see if the given genre exists
     const genreExist = genres.find(g=> g.genre === req.params.genre);
     if(!genreExist){
-        res.send(req.params.genre + " genre does not exist");
+        res.status(404).send(req.params.genre + " genre does not exist");
     }
     else{
         //checks to see if the songs already exists in a SPECIFIC GENRE (that means multiples songs of same name but different genres)
         const songExist = songs.find(s=> s.name === req.body.songName && s.genre === genreExist.genre);
         if(songExist){
-            res.send(req.body.songName + " song already exists for this genre");
+            res.status(404).send(req.body.songName + " song already exists for this genre");
         }
         //this means we will add songs
         else{
@@ -139,7 +139,7 @@ app.post("/api/home/genres",(req,res)=>{
             genre: req.body.newGenre,
         };
         genres.push(genreToAdd);
-        res.send(genreToAdd);
+        res.status(404).send(genreToAdd);
     }
     else{
         res.send(req.body.newGenre + " genre already exist");
@@ -154,7 +154,7 @@ app.put("/api/home/genres",(req,res)=>{
     //finds the id of the genres thats about to be replaced
     const genreExist = genres.find(g=> g.id === parseInt(req.body.idOfOldGenre));
     if(!genreExist){
-        res.send(req.body.idOfOldGenre + " genre ID does not exist.");
+        res.status(404).send(req.body.idOfOldGenre + " genre ID does not exist.");
     }
     else{
         var temp = genres[req.body.idOfOldGenre - 1].genre;
@@ -176,7 +176,7 @@ app.put("/api/home/genres",(req,res)=>{
 app.delete("/api/home/genres",(req,res)=>{
     const genreExist = genres.find(g=> g.id === parseInt(req.body.genreID));
     if(!genreExist){
-        res.send(req.body.genreID + " does not Exist!");
+        res.status(404).send(req.body.genreID + " does not Exist!");
     }
     else{
         res.send(genreExist);
@@ -207,7 +207,7 @@ app.delete("/api/home/genres/:genre",(req,res)=>{
     //searches if the genre exists
     const genreExist = genres.find(g=> g.id === parseInt(req.params.genre));
     if(!genreExist){
-        res.send(req.params.genreID + " does not Exist!");
+        res.status(404).send(req.params.genreID + " does not Exist!");
     }
     else{
         //searches if the song exists in the specific genre
