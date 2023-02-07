@@ -176,7 +176,7 @@ app.put("/api/home/genres",(req,res)=>{
 app.delete("/api/home/genres",(req,res)=>{
     const genreExist = genres.find(g=> g.id === parseInt(req.body.genreID));
     if(!genreExist){
-        res.send(req.params.genreID + " does not Exist!");
+        res.send(req.body.genreID + " does not Exist!");
     }
     else{
         res.send(genreExist);
